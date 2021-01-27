@@ -1,0 +1,50 @@
+package com.example.demo.Controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.Model.RegisterModel;
+import com.example.demo.Service.RegisterService;
+
+@RestController
+public class RegisterController {
+
+	@Autowired
+	public RegisterService ser;
+	
+	@GetMapping("/register")
+	public RegisterModel RegisterUser(@RequestBody RegisterModel model) throws Exception {
+		
+		String TempEmailid = model.getEmailid();
+		if(TempEmailid != null && !"".equals(TempEmailid) ) {
+			RegisterModel emailcheck = ser.FetchEmailId(TempEmailid);
+			if(emailcheck != null) {
+				throw new Exception("User Already Exist");
+			}
+			
+		}
+		RegisterModel reqobj = null;
+		reqobj = ser.save(model);
+		return reqobj;
+	}
+	
+	@PostMapping("/login")
+	public RegisterModel LoginUser(@RequestBody RegisterModel model) throws Exception {
+		
+		String tempEmailId = model.getEmailid();
+		String tempPassword = model.getPassword();
+		RegisterModel Logincheck = null;
+		if(tempEmailId != null && tempPassword != null) {
+			Logincheck = ser.FetchEmailidAndPassword(tempEmailId, tempPassword); 
+		}
+		if(Logincheck == null) {
+			throw new Exception("User already exist");
+		}
+		return Logincheck;
+		
+	}
+	
+}
